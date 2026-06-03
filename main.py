@@ -8,8 +8,9 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.pipeline import Pipeline as SKPipeline 
 from sklearn.compose import ColumnTransformer
 from sklearn.tree import DecisionTreeClassifier
-from imblearn.over_sampling import SMOTE
-from imblearn.pipeline import Pipeline as IMBPipeline 
+from sklearn.ensemble import RandomForestClassifier
+# from imblearn.over_sampling import SMOTE
+# from imblearn.pipeline import Pipeline as IMBPipeline 
 
 PIPELINE_FILE = "pipeline.pkl"
 
@@ -29,10 +30,10 @@ def build_pipeline(num_attributes,cat_attributes):
         ("categorical",cat_pipeline,cat_attributes)
     ])
     
-    final_pipeline = IMBPipeline([
+    final_pipeline = SKPipeline([
         ("preprocess",preprocessor),
-        ("smote",SMOTE(random_state=42)),
-        ("model",DecisionTreeClassifier(class_weight="balanced"))
+        # ("smote",SMOTE(random_state=42)),
+        ("model",RandomForestClassifier(class_weight="balanced"))
     ])
 
     return final_pipeline
@@ -66,5 +67,6 @@ else :
     predicted_data = pipeline.predict(input_data)
     input_data["isFraud predicted"] = predicted_data
     input_data.to_csv("output.csv", index = False)
+    print()
     print("Inference is complete, results saved to output.csv Enjoy!")
 

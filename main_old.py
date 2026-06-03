@@ -13,6 +13,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
 from sklearn.model_selection import cross_validate
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score,f1_score,precision_score,recall_score,roc_auc_score
 #  step 1 - Loading the dataset 
 data = pd.read_csv("TransactionData.csv")
@@ -48,41 +49,42 @@ preprocessor = ColumnTransformer([
                ("categorical",cat_pipeline,cat_attributes)
 ])
 # step 9 - Applying SMOTE (Synthetic Minority Oversampling Technique)
-final_pipeline = ImbPipeline([
+final_pipeline = SKPipeline([
                   ("preprocess",preprocessor),
-                  ("smote",SMOTE(random_state=42)),
-                  ("model",DecisionTreeClassifier(class_weight="balanced"))
+                #   ("smote",SMOTE(random_state=42)),
+                  ("model",XGBClassifier())
                   
 ])
-final_pipeline.fit(features,labels)
-X_result = final_pipeline.predict(X_test)
-accuracy = accuracy_score(X_result,X_label)
-recall = recall_score(X_result,X_label)
-f1 = f1_score(X_result,X_label)
-precision = precision_score(X_result,X_label)
-print(accuracy)
-print(recall)
-print(f1)
-print(precision)
-from sklearn.metrics import classification_report, confusion_matrix
+# final_pipeline.fit(features,labels)
+# X_result = final_pipeline.predict(X_test)
+# accuracy = accuracy_score(X_result,X_label)
+# recall = recall_score(X_result,X_label)
+# f1 = f1_score(X_label,X_result)
+# precision = precision_score(X_result,X_label)
+# print(accuracy)
+# print(recall)
+# print(f1)
+# print(precision)
+# from sklearn.metrics import classification_report, confusion_matrix
 
-print(confusion_matrix(X_result, X_label))
-print(classification_report(X_result, X_label))
+# print(confusion_matrix(X_result, X_label))
+# print(classification_report(X_result, X_label))
 
-# # step 10 - Trainig the model 
-# scores_1 = cross_validate(
-#     final_pipeline,
-#     features,
-#     labels,
-#     scoring=["accuracy","precision","recall","f1","roc_auc"],
-#     cv=2
-# )
-# print("Cross validation completed!")
-# print(scores_1.keys())
-# print("Accuracy :", scores_1["test_accuracy"].mean())
-# print("Precision :", scores_1["test_precision"].mean())
-# print("Recall   :", scores_1["test_recall"].mean())
-# print("F1 Score :", scores_1["test_f1"].mean())
-# print("ROC AUC  :", scores_1["test_roc_auc"].mean())
+# step 10 - Trainig the model 
+print("Cross Validation Started")
+scores_1 = cross_validate(
+    final_pipeline,
+    features,
+    labels,
+    scoring=["accuracy","precision","recall","f1","roc_auc"],
+    cv=10
+)
+print("Cross validation completed!")
+print(scores_1.keys())
+print("Accuracy :", scores_1["test_accuracy"].mean())
+print("Precision :", scores_1["test_precision"].mean())
+print("Recall   :", scores_1["test_recall"].mean())
+print("F1 Score :", scores_1["test_f1"].mean())
+print("ROC AUC  :", scores_1["test_roc_auc"].mean())
 # # So the recommended model will be XGBoost 
 # 
